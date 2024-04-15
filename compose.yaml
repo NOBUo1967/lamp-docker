@@ -1,0 +1,33 @@
+services:
+  app:
+    ports:
+      - "8000:80"
+    volumes:
+      - type: bind
+        source: ./src
+        target: /var/www/html
+    build: ./docker/app
+
+  db:
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=sample
+      - TZ=Asia/Tokyo
+    ports:
+      - "3306:3306"
+    volumes:
+      - type: volume
+        source: php-env-compose-volume
+        target: /var/lib/mysql
+      # - type: bind
+      #   source: ./config/my.cnf
+      #   target: /etc/mysql/conf.d/my.cnf
+      - type: bind
+        source: ./docker/db/init
+        target: /docker-entrypoint-initdb.d
+    image: mysql:5.7
+
+volumes:
+  php-env-compose-volume:
